@@ -15,6 +15,12 @@ func GetTokenFromAkeylessCommandLine() (string, error) {
 	}
 
 	cmdParts := strings.Fields(cmdStr)
+	
+	// Check if the path points to an executable file
+	if _, err := os.Stat(cmdParts[0]); os.IsNotExist(err) {
+		return "", errors.New("The path does not point to an executable file")
+	}
+
 	cmd := exec.Command(cmdParts[0], cmdParts[1:]...)
 
 	output, err := cmd.Output()
