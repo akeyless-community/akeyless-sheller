@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// GetToken shells out to the Akeyless CLI to handle authentication and return a token.
-func GetToken() (string, error) {
+// GetTokenFromAkeylessCommandLine shells out to the Akeyless CLI to handle authentication and return a token.
+func GetTokenFromAkeylessCommandLine() (string, error) {
 	cmdStr := os.Getenv("AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND")
 	if cmdStr == "" {
 		return "", nil
