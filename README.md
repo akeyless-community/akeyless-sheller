@@ -8,7 +8,7 @@ To install Akeyless Sheller, you need to import it into your Golang project.
 
 ## Usage
 
-To use Akeyless Sheller, run the `GetTokenFromAkeylessCommandLine` function. This function looks for the `AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND` environment variable to be set. The value of this variable should be something like:
+To use Akeyless Sheller, run the `GetTokenFromAkeylessCommandLine` function. This function requires the `AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND` environment variable to be set. If it is not set, the function will return an error. The value of this variable should be something like:
 
 ```
 akeyless auth --access-id p-jgk2szbi1vwd --access-type saml --json --jq-expression '.token'
