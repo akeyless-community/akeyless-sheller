@@ -26,4 +26,11 @@ func TestGetTokenFromAkeylessCommandLine(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expected error when AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND is set to an invalid command, got nil")
 	}
+
+	// Test case when AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND is set to a path that does not point to an executable file
+	os.Setenv("AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND", "/path/that/does/not/point/to/an/executable")
+	_, err = GetTokenFromAkeylessCommandLine()
+	if err == nil {
+		t.Errorf("Expected error when AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND is set to a path that does not point to an executable file, got nil")
+	}
 }
