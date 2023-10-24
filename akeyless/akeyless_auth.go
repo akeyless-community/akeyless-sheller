@@ -1,6 +1,7 @@
 package akeyless
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"strings"
