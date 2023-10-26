@@ -11,7 +11,7 @@ import (
 func GetTokenFromAkeylessCommandLine() (string, error) {
 	cmdStr := os.Getenv("AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND")
 	if cmdStr == "" {
-		return "", errors.New("AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND environment variable is not set")
+		return "", errors.New("the AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND environment variable is not set")
 	}
 
 	cmdParts := strings.Fields(cmdStr)
