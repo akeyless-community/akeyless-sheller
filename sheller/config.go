@@ -17,7 +17,7 @@ type Config struct {
 	Profile      string        // Name of the Akeyless CLI profile to use
 	AkeylessPath string        // Path to the .akeyless directory
 	ExpiryBuffer time.Duration // Buffer time before token expiry to trigger re-authentication
-	Debug        bool          // Debug flag to enable or disable debugging
+	Debug        bool          // Debug flag to enable or disable debug logging
 }
 
 // NewConfig creates a new Config instance with the provided parameters.
