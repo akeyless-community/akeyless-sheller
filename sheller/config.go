@@ -125,7 +125,7 @@ func ValidateConfig(config *Config) error {
 
 		akeylessHomeDir := filepath.Join(homeDir, ".akeyless")
 
-	if err := ValidateAkeylessHomeExists(akeylessHomeDir, "default"); err != nil {
+	if err := ValidateAkeylessHomeDirectoryExists(akeylessHomeDir, "default"); err != nil {
 		return err
 	}
 	if config.Debug {
@@ -153,7 +153,7 @@ func ValidateConfig(config *Config) error {
 	return nil
 }
 
-func ValidateAkeylessHomeExists(akeylessHomeDir string, profileName string) error {
+func ValidateAkeylessHomeDirectoryExists(akeylessHomeDir string, profileName string) error {
 	akeylessPathInfo, err := os.Stat(akeylessHomeDir)
 	if err != nil {
 		return err
