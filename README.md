@@ -4,23 +4,10 @@ A Go library for simplifying the process of authenticating and managing tokens w
 
 ## Getting Started
 
-1. **Clone the Repository:**
+1. **Install Library:**
 
 ```bash
-git clone https://github.com/your-username/akeyless-sheller.git
-cd akeyless-sheller
-```
-
-1. **Install Dependencies:**
-
-```bash
-go mod tidy
-```
-
-1. **Run the Example:**
-
-```bash
-go run main.go
+go get github.com/akeyless-community/akeyless-sheller/sheller
 ```
 
 ## Example Quickstart
