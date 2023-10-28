@@ -16,24 +16,9 @@ func main() {
 		10*time.Minute,                // ExpiryBuffer
 	)
 
-	// Initialize the sheller library
-	err := sheller.InitializeLibrary(config)
+	token, err := sheller.InitializeAndGetToken(config)
 	if err != nil {
-		fmt.Printf("Failed to initialize sheller library: %v\n", err)
-		return
-	}
-
-	// Load the specified profile
-	profile, err := sheller.GetProfile(config.Profile, config)
-	if err != nil {
-		fmt.Printf("Failed to load profile: %v\n", err)
-		return
-	}
-
-	// Get a token for the specified profile
-	token, err := sheller.GetToken(profile, config)
-	if err != nil {
-		fmt.Printf("Failed to get token: %v\n", err)
+		fmt.Printf("Failed to initialize and get token: %v\n", err)
 		return
 	}
 

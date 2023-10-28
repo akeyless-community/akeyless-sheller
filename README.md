@@ -2,23 +2,6 @@
 
 A Go library for simplifying the process of authenticating and managing tokens with the Akeyless CLI. This library handles token retrieval and management, ensuring tokens are reused when valid and only re-authenticating when necessary to reduce unnecessary user prompts.
 
-## Directory Structure
-
-```plaintext
-.
-├── LICENSE
-├── README.md
-├── akeyless-sheller
-├── go.mod
-├── go.sum
-├── main.go           # Example implementation of the library
-├── main_test.go
-└── sheller
-    ├── config.go
-    ├── profile.go
-    └── token.go
-```
-
 ## Getting Started
 
 1. **Clone the Repository:**
@@ -28,19 +11,55 @@ git clone https://github.com/your-username/akeyless-sheller.git
 cd akeyless-sheller
 ```
 
-2. **Install Dependencies:**
+1. **Install Dependencies:**
 
 ```bash
 go mod tidy
 ```
 
-3. **Run the Example:**
+1. **Run the Example:**
 
 ```bash
 go run main.go
 ```
 
-## Example Implementation
+## Example Quickstart
+
+The following code snippet provides a quickstart example of how to use the `sheller` library to obtain a token for a specified profile:
+
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+
+    "github.com/akeyless-community/akeyless-sheller/sheller"
+)
+
+func main() {
+    // Define the configuration
+    config := sheller.NewConfig(
+        "", // will pull from path if akeyless CLI is on system path
+        "default", // the name of the CLI profile to use
+        "/Users/chrisgruel/.akeyless", // the path to the Akeyless home directory usually located at ~/.akeyless
+        10*time.Minute, // if the token expiration is within this upcoming interval, a new token will be obtained
+    )
+
+    // Get a token for the specified profile
+    token, err := sheller.GetToken(profile, config)
+    if err != nil {
+        fmt.Printf("Failed to get token: %v\n", err)
+        return
+    }
+
+    // Print the obtained token
+    fmt.Printf("Obtained token: %v\n", token.Token)
+}
+
+```
+
+## Example Full Implementation
 
 The `main.go` file in the root directory serves as an example implementation of the `sheller` library. Below is a brief explanation of how it operates:
 
@@ -57,15 +76,17 @@ import (
     "fmt"
     "sheller"
     "time"
+
+    "github.com/akeyless-community/akeyless-sheller/sheller"
 )
 
 func main() {
     // Define the configuration
     config := sheller.NewConfig(
-        "/path/to/akeyless-cli",
-        "default",
-        "/Users/chrisgruel/.akeyless",
-        10*time.Minute,
+        "", // will pull from path if akeyless CLI is on system path
+        "default", // the name of the CLI profile to use
+        "/Users/chrisgruel/.akeyless", // the path to the Akeyless home directory usually located at ~/.akeyless
+        10*time.Minute, // if the token expiration is within this upcoming interval, a new token will be obtained
     )
 
     // Initialize the sheller library
@@ -110,4 +131,4 @@ go test ./...
 
 ## License
 
-This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the terms of the Apache 2.0 license. See the [LICENSE](LICENSE) file for details.
