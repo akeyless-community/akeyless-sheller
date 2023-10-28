@@ -41,7 +41,27 @@ func LoadConfigFromEnv() *Config {
 
 // InitializeLibrary initializes the Sheller library with the provided configuration.
 func InitializeLibrary(config *Config) error {
-	// TODO: Implement initialization logic based on the provided configuration.
-	// This might include validating the configuration, setting up logging, etc.
+	// If any property of the Config struct is empty, load it from the environment variable.
+	if config.CLIPath == "" {
+		config.CLIPath = os.Getenv("SHELLER_CLI_PATH")
+	}
+	if config.Profile == "" {
+		config.Profile = os.Getenv("SHELLER_PROFILE")
+	}
+	if config.AkeylessPath == "" {
+		config.AkeylessPath = os.Getenv("SHELLER_AKEYLESS_HOME_DIRECTORY_PATH")
+	}
+	if config.ExpiryBuffer == 0 {
+		expiryBufferStr := os.Getenv("SHELLER_EXPIRY_BUFFER")
+		expiryBuffer, err := time.ParseDuration(expiryBufferStr)
+		if err != nil {
+			expiryBuffer = 10 * time.Minute // Default value of 10 minutes
+		}
+		config.ExpiryBuffer = expiryBuffer
+	}
+
+	// TODO: Validate the configuration.
+	// This might include checking if the paths exist, if the profile is valid, etc.
+
 	return nil
 }
