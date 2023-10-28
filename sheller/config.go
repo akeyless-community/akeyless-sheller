@@ -88,11 +88,11 @@ func ValidateConfig(config *Config) error {
 	}
 
 	if config.Profile == "" {
-		cliProfileExists, _ := ValidateAkeylessCliProfileExists(config.AkeylessPath, "default")
-		if cliProfileExists {
+		cliProfileExistsError := ValidateAkeylessCliProfileExists(config.AkeylessPath, "default")
+		if cliProfileExistsError == nil {
 			config.Profile = "default"
 		} else {
-			return errors.New("the Akeyless CLI Profile name to use is not set")
+			return errors.New("the Akeyless CLI Profile name to use is not set and the default profile does not exist")
 		}
 	}
 
@@ -149,22 +149,22 @@ func ValidateConfig(config *Config) error {
 func ValidateAkeylessHomeExists(akeylessHomeDir string, profileName string) error {
 	akeylessPathInfo, err := os.Stat(akeylessHomeDir)
 	if err != nil {
-		return true, err
+		return err
 	}
 	if !akeylessPathInfo.IsDir() {
-		return true, errors.New("the AkeylessPath does not lead to a directory")
+		return errors.New("the AkeylessPath does not lead to a directory")
 	}
 
 	profilesDirPath := filepath.Join(akeylessHomeDir, "profiles")
 	profilesDirInfo, err := os.Stat(profilesDirPath)
 	if err != nil {
-		return true, err
+		return err
 	}
 	if !profilesDirInfo.IsDir() {
-		return true, errors.New("the profiles subdirectory does not exist inside the AkeylessPath directory meaning that the AkeylessPath is likely not a valid Akeyless home directory")
+		return errors.New("the profiles subdirectory does not exist inside the AkeylessPath directory meaning that the AkeylessPath is likely not a valid Akeyless home directory")
 	}
 	
-	return false, nil
+	return nil
 }
 
 func ValidateAkeylessCliProfileExists(profilesDirPath string, profileName string) error {
@@ -172,14 +172,14 @@ func ValidateAkeylessCliProfileExists(profilesDirPath string, profileName string
 	_, err := os.Stat(profileFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return false, errors.New("the profile file does not exist")
+			return errors.New("the profile file does not exist")
 		}
 		if os.IsPermission(err) {
-			return false, errors.New("the profile file is not readable")
+			return errors.New("the profile file is not readable")
 		}
-		return false, err
+		return err
 	}
-	return true, nil
+	return nil
 }
 
 // InitializeLibrary initializes the Sheller library with the provided configuration.
