@@ -1,33 +1,39 @@
-package sheller
+package main
 
-import (
-	"errors"
-	"os"
-	"os/exec"
-	"strings"
-)
+// "fmt"
 
-// GetTokenFromAkeylessCommandLine shells out to the Akeyless CLI to handle authentication and return a token.
-func GetTokenFromAkeylessCommandLine() (string, error) {
-	cmdStr := os.Getenv("AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND")
-	if cmdStr == "" {
-		return "", errors.New("the AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND environment variable is not set")
-	}
+// "time"
 
-	cmdParts := strings.Fields(cmdStr)
+func main() {
+	// // Define the configuration
+	// config := sheller.NewConfig(
+	// 	"/path/to/akeyless-cli", // CLIPath
+	// 	"default",               // Profile
+	// 	"/Users/chrisgruel/.akeyless", // AkeylessPath
+	// 	10*time.Minute,          // ExpiryBuffer
+	// )
 
-	// Check if the path points to an executable file
-	if _, err := os.Stat(cmdParts[0]); os.IsNotExist(err) {
-		return "", errors.New("the path does not point to an executable file")
-	}
+	// // Initialize the sheller library
+	// err := sheller.InitializeLibrary(config)
+	// if err != nil {
+	// 	fmt.Printf("Failed to initialize sheller library: %v\n", err)
+	// 	return
+	// }
 
-	cmd := exec.Command(cmdParts[0], cmdParts[1:]...)
+	// // Load the specified profile
+	// profile, err := sheller.GetProfile(config.Profile, config)
+	// if err != nil {
+	// 	fmt.Printf("Failed to load profile: %v\n", err)
+	// 	return
+	// }
 
-	output, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
+	// // Get a token for the specified profile
+	// token, err := sheller.GetToken(profile, config)
+	// if err != nil {
+	// 	fmt.Printf("Failed to get token: %v\n", err)
+	// 	return
+	// }
 
-	token := strings.TrimSpace(string(output))
-	return token, nil
+	// // Print the obtained token
+	// fmt.Printf("Obtained token: %v\n", token.Token)
 }
