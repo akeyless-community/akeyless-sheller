@@ -33,10 +33,10 @@ func main() {
         10*time.Minute, // if the token expiration is within this upcoming interval, a new token will be obtained
     )
 
-    // Get a token for the specified profile
-    token, err := sheller.GetToken(profile, config)
+    // Initialize the sheller library and get the token
+    token, err := sheller.InitializeAndGetToken(config)
     if err != nil {
-        fmt.Printf("Failed to get token: %v\n", err)
+        fmt.Printf("Failed to initialize and get token: %v\n", err)
         return
     }
 
