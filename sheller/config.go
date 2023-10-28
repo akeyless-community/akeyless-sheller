@@ -59,6 +59,16 @@ func ValidateConfig(config *Config) error {
 			config.CLIPath = akeylessFound
 		}
 	}
+
+	// Check if the CLIPath is an executable file
+	fileInfo, err := os.Stat(config.CLIPath)
+	if err != nil {
+		return err
+	}
+	if (fileInfo.Mode() & 0111) == 0 {
+		return errors.New("the CLIPath does not lead to an executable file")
+	}
+
 	// TODO: Add more validations here.
 	return nil
 }
