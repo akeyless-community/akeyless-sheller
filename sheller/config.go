@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/hairyhenderson/go-which"
@@ -39,7 +40,8 @@ func NewConfigWithDefaults() *Config {
 		fmt.Println("Error:", err)
 	}
 	fmt.Println("Found Home Directory:", homeDir)
-	akeylessHomeDir := homeDir + "/.akeyless"
+	akeylessHomeDir := filepath.Join(homeDir, ".akeyless")
+
 	return NewConfig("", "default", akeylessHomeDir, 0, false)
 }
 
@@ -85,6 +87,15 @@ func ValidateConfig(config *Config) error {
 		}
 	}
 
+	if config.Profile == "" {
+		cliProfileExists, _ := ValidateAkeylessCliProfileExists(config.AkeylessPath, "default")
+		if cliProfileExists {
+			config.Profile = "default"
+		} else {
+			return errors.New("the Akeyless CLI Profile name to use is not set")
+		}
+	}
+
 	// Check if the CLIPath is an executable file
 	fileInfo, err := os.Stat(config.CLIPath)
 	if err != nil {
@@ -96,39 +107,37 @@ func ValidateConfig(config *Config) error {
 
 	// Check if the AkeylessPath property is not empty
 	if config.AkeylessPath == "" {
-		return errors.New("the AkeylessPath is not set")
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			fmt.Println("Error:", err)
+		}
+
+		if config.Debug {
+			fmt.Println("**DEBUG** Home Directory:", homeDir)
+		}
+
+		akeylessHomeDir := filepath.Join(homeDir, ".akeyless")
+
+		akeylessHomeExists, homeExistsErrors := ValidateAkeylessHomeExists(akeylessHomeDir, "default")
+		if homeExistsErrors != nil {
+			return homeExistsErrors
+		}
+		if akeylessHomeExists {
+			if config.Debug {
+				fmt.Println("**DEBUG** Akeyless Home Directory exists")
+			}
+			config.AkeylessPath = akeylessHomeDir
+		} else {
+			return errors.New("the AkeylessPath is not set")
+		}
 	}
 
 	// Check if the AkeylessPath property leads to an existing directory
-	akeylessPathInfo, err := os.Stat(config.AkeylessPath)
-	if err != nil {
-		return err
-	}
-	if !akeylessPathInfo.IsDir() {
-		return errors.New("the AkeylessPath does not lead to a directory")
-	}
-
 	// Check if the profiles subdirectory exists inside the AkeylessPath directory
-	profilesDirPath := config.AkeylessPath + "/profiles"
-	profilesDirInfo, err := os.Stat(profilesDirPath)
-	if err != nil {
-		return err
-	}
-	if !profilesDirInfo.IsDir() {
-		return errors.New("the profiles subdirectory does not exist inside the AkeylessPath directory meaning that the AkeylessPath is likely not a valid Akeyless home directory")
-	}
-
 	// Check if the profile file exists and is readable
-	profileFilePath := profilesDirPath + "/" + config.Profile + ".toml"
-	_, err = os.Stat(profileFilePath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return errors.New("the profile file does not exist")
-		}
-		if os.IsPermission(err) {
-			return errors.New("the profile file is not readable")
-		}
-		return err
+	cliProfileExists, profileExistsErrors := ValidateAkeylessCliProfileExists(config.AkeylessPath, config.Profile)
+	if cliProfileExists {
+		return profileExistsErrors
 	}
 
 	if config.Debug {
@@ -141,6 +150,42 @@ func ValidateConfig(config *Config) error {
 	}
 
 	return nil
+}
+
+func ValidateAkeylessHomeExists(akeylessHomeDir string, profileName string) (bool, error) {
+	akeylessPathInfo, err := os.Stat(akeylessHomeDir)
+	if err != nil {
+		return true, err
+	}
+	if !akeylessPathInfo.IsDir() {
+		return true, errors.New("the AkeylessPath does not lead to a directory")
+	}
+
+	profilesDirPath := filepath.Join(akeylessHomeDir, "profiles")
+	profilesDirInfo, err := os.Stat(profilesDirPath)
+	if err != nil {
+		return true, err
+	}
+	if !profilesDirInfo.IsDir() {
+		return true, errors.New("the profiles subdirectory does not exist inside the AkeylessPath directory meaning that the AkeylessPath is likely not a valid Akeyless home directory")
+	}
+	
+	return false, nil
+}
+
+func ValidateAkeylessCliProfileExists(profilesDirPath string, profileName string) (bool, error) {
+	profileFilePath := filepath.Join(profilesDirPath, profileName + ".toml")
+	_, err := os.Stat(profileFilePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, errors.New("the profile file does not exist")
+		}
+		if os.IsPermission(err) {
+			return false, errors.New("the profile file is not readable")
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 // InitializeLibrary initializes the Sheller library with the provided configuration.
