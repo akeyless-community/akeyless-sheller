@@ -1,8 +1,11 @@
 package sheller
 
 import (
+	"errors"
 	"os"
 	"time"
+
+	"github.com/hairyhenderson/go-which"
 )
 
 // Config holds the configuration options for the Sheller library.
@@ -46,17 +49,14 @@ func LoadConfigFromEnv(config *Config) {
 	}
 }
 
-import (
-	"github.com/hairyhenderson/go-which"
-	// other imports...
-)
-
 // ValidateConfig validates the provided configuration.
 func ValidateConfig(config *Config) error {
 	if config.CLIPath == "" {
-		_, err := which.Which("akeyless")
-		if err != nil {
-			return fmt.Errorf("CLIPath is not set and akeyless is not in the system path")
+		akeylessFound := which.Which("akeyless")
+		if akeylessFound == "" {
+			return errors.New("the CLIPath is not set and akeyless is not in the system path")
+		} else {
+			config.CLIPath = akeylessFound
 		}
 	}
 	// TODO: Add more validations here.

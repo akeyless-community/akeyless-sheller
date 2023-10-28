@@ -10,7 +10,7 @@ import (
 func main() {
 	// // Define the configuration
 	config := sheller.NewConfig(
-		"/opt/homebrew/bin",           // CLIPath
+		"",                            // CLIPath
 		"default",                     // Profile
 		"/Users/chrisgruel/.akeyless", // AkeylessPath
 		10*time.Minute,                // ExpiryBuffer
