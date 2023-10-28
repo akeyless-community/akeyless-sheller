@@ -2,19 +2,13 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/akeyless-community/akeyless-sheller/sheller"
 )
 
 func main() {
-	// // Define the configuration
-	config := sheller.NewConfig(
-		"",                            // CLIPath
-		"default",                     // Profile
-		"/Users/chrisgruel/.akeyless", // AkeylessPath
-		10*time.Minute,                // ExpiryBuffer
-	)
+	// Define the configuration
+	config := sheller.NewConfigWithDefaults()
 
 	token, err := sheller.InitializeAndGetToken(config)
 	if err != nil {

@@ -2,6 +2,7 @@ package sheller
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -26,6 +27,18 @@ func NewConfig(cliPath, profile, akeylessPath string, expiryBuffer time.Duration
 		AkeylessPath: akeylessPath,
 		ExpiryBuffer: expiryBuffer,
 	}
+}
+
+// NewConfigWithDefaults creates a new Config instance with default values like
+// pulling the CLIPath from the system path and using the "default" CLI profile
+func NewConfigWithDefaults() *Config {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	fmt.Println("Found Home Directory:", homeDir)
+	akeylessHomeDir := homeDir + "/.akeyless"
+	return NewConfig("", "default", akeylessHomeDir, 0)
 }
 
 // LoadConfigFromEnv loads configuration options from environment variables.

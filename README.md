@@ -26,12 +26,7 @@ import (
 
 func main() {
     // Define the configuration
-    config := sheller.NewConfig(
-        "", // will pull from path if akeyless CLI is on system path
-        "default", // the name of the CLI profile to use
-        "/Users/chrisgruel/.akeyless", // the path to the Akeyless home directory usually located at ~/.akeyless
-        10*time.Minute, // if the token expiration is within this upcoming interval, a new token will be obtained
-    )
+    config := sheller.NewConfigWithDefaults()
 
     // Initialize the sheller library and get the token
     token, err := sheller.InitializeAndGetToken(config)
