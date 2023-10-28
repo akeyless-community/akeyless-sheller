@@ -69,6 +69,19 @@ func ValidateConfig(config *Config) error {
 		return errors.New("the CLIPath does not lead to an executable file")
 	}
 
+	// Check if the profile file exists and is readable
+	profileFilePath := config.AkeylessPath + "/profiles/" + config.Profile + ".toml"
+	_, err = os.Stat(profileFilePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return errors.New("the profile file does not exist")
+		}
+		if os.IsPermission(err) {
+			return errors.New("the profile file is not readable")
+		}
+		return err
+	}
+
 	// TODO: Add more validations here.
 	return nil
 }
