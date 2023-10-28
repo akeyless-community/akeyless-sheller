@@ -8,6 +8,8 @@ import (
 	"github.com/hairyhenderson/go-which"
 )
 
+var DEFAULT_EXPIRY_BUFFER = 10 * time.Minute
+
 // Config holds the configuration options for the Sheller library.
 type Config struct {
 	CLIPath      string        // Path to the Akeyless CLI executable
@@ -46,6 +48,9 @@ func LoadConfigFromEnv(config *Config) {
 		if err == nil {
 			config.ExpiryBuffer = expiryBuffer
 		}
+	}
+	if config.ExpiryBuffer == 0 {
+		config.ExpiryBuffer = DEFAULT_EXPIRY_BUFFER
 	}
 }
 
@@ -106,7 +111,6 @@ func ValidateConfig(config *Config) error {
 		return err
 	}
 
-	// TODO: Add more validations here.
 	return nil
 }
 
