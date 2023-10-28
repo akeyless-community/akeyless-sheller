@@ -46,13 +46,33 @@ func LoadConfigFromEnv(config *Config) {
 	}
 }
 
+import (
+	"github.com/hairyhenderson/go-which"
+	// other imports...
+)
+
+// ValidateConfig validates the provided configuration.
+func ValidateConfig(config *Config) error {
+	if config.CLIPath == "" {
+		_, err := which.Which("akeyless")
+		if err != nil {
+			return fmt.Errorf("CLIPath is not set and akeyless is not in the system path")
+		}
+	}
+	// TODO: Add more validations here.
+	return nil
+}
+
 // InitializeLibrary initializes the Sheller library with the provided configuration.
 func InitializeLibrary(config *Config) error {
 	// Load configuration from environment variables
 	LoadConfigFromEnv(config)
 
-	// TODO: Validate the configuration.
-	// This might include checking if the paths exist, if the profile is valid, etc.
+	// Validate the configuration.
+	err := ValidateConfig(config)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
