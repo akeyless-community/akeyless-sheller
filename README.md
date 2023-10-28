@@ -1,57 +1,113 @@
 # Akeyless Sheller
 
-Akeyless Sheller is a Golang library designed to shell out to the Akeyless CLI to retrieve a token. This token can then be used in multiple tools such as CLI helpers and Terraform.
+A Go library for simplifying the process of authenticating and managing tokens with the Akeyless CLI. This library handles token retrieval and management, ensuring tokens are reused when valid and only re-authenticating when necessary to reduce unnecessary user prompts.
 
-## Prerequisites
+## Directory Structure
 
-Before you begin, ensure you have met the following requirements:
-* You have installed the latest version of Go.
-* You have a `<Windows/Linux/Mac>` machine. State which OS is supported or works with the software.
-* You have read `<guide/link/documentation_related_to_project>`.
-
-## Installation
-
-To install Akeyless Sheller, follow these steps:
-
-1. Clone the repository
-2. Navigate to the cloned repository
-3. Run `go build`
-
-## Usage
-
-To use Akeyless Sheller, follow these steps:
-
-1. Import it into your Golang project.
-2. Run the `GetTokenFromAkeylessCommandLine` function. This function requires the `AKEYLESS_CLI_AUTHENTICATION_TOKEN_COMMAND` environment variable to be set. If it is not set, or if it is set to a path that does not point to an executable file, the function will return an error. The value of this variable should be something like:
-
-```sh
-akeyless auth --access-id p-jgk2szbi1vwd --access-type saml --json --jq-expression '.token'
+```plaintext
+.
+├── LICENSE
+├── README.md
+├── akeyless-sheller
+├── go.mod
+├── go.sum
+├── main.go           # Example implementation of the library
+├── main_test.go
+└── sheller
+    ├── config.go
+    ├── profile.go
+    └── token.go
 ```
 
-or
+## Getting Started
 
-```sh
-/path/to/akeyless auth --access-id p-jgk2szbi1vwd --access-type saml --json --jq-expression '.token'
+1. **Clone the Repository:**
+
+```bash
+git clone https://github.com/your-username/akeyless-sheller.git
+cd akeyless-sheller
 ```
+
+2. **Install Dependencies:**
+
+```bash
+go mod tidy
+```
+
+3. **Run the Example:**
+
+```bash
+go run main.go
+```
+
+## Example Implementation
+
+The `main.go` file in the root directory serves as an example implementation of the `sheller` library. Below is a brief explanation of how it operates:
+
+1. Define the configuration using `sheller.NewConfig`.
+2. Initialize the `sheller` library using `sheller.InitializeLibrary`.
+3. Load the specified profile using `sheller.GetProfile`.
+4. Obtain a token for the specified profile using `sheller.GetToken`.
+5. Print the obtained token to the console.
+
+```go
+package main
+
+import (
+    "fmt"
+    "sheller"
+    "time"
+)
+
+func main() {
+    // Define the configuration
+    config := sheller.NewConfig(
+        "/path/to/akeyless-cli",
+        "default",
+        "/Users/chrisgruel/.akeyless",
+        10*time.Minute,
+    )
+
+    // Initialize the sheller library
+    err := sheller.InitializeLibrary(config)
+    if err != nil {
+        fmt.Printf("Failed to initialize sheller library: %v\n", err)
+        return
+    }
+
+    // Load the specified profile
+    profile, err := sheller.GetProfile(config.Profile, config)
+    if err != nil {
+        fmt.Printf("Failed to load profile: %v\n", err)
+        return
+    }
+
+    // Get a token for the specified profile
+    token, err := sheller.GetToken(profile, config)
+    if err != nil {
+        fmt.Printf("Failed to get token: %v\n", err)
+        return
+    }
+
+    // Print the obtained token
+    fmt.Printf("Obtained token: %v\n", token.Token)
+}
+```
+
+## Library Structure
+
+- `sheller/config.go`: Defines the configuration structure and provides a function to initialize the library.
+- `sheller/profile.go`: Provides functions to load and list Akeyless CLI profiles.
+- `sheller/token.go`: Provides functions to check for existing tokens, shell out for new tokens, and retrieve tokens for specified profiles.
 
 ## Testing
 
-To run tests, execute the following command in the project directory:
+To run the provided tests, use the following command:
 
-```sh
+```bash
 go test ./...
 ```
 
-## Contributing to Akeyless Sheller
-
-To contribute to Akeyless Sheller, follow these steps:
-
-1. Fork the repository.
-2. Create a new branch: `git checkout -b '<branch_name>'`.
-3. Make your changes and commit them: `git commit -m '<commit_message>'`
-4. Push to the original branch: `git push origin '<project_name>/<location>'`
-5. Create the pull request.
-
 ## License
 
-Akeyless Sheller is licensed under the Apache 2.0 License.
+This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file for details.
