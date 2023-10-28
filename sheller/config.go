@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/hairyhenderson/go-which"
@@ -21,12 +22,13 @@ type Config struct {
 }
 
 // NewConfig creates a new Config instance with the provided parameters.
-func NewConfig(cliPath, profile, akeylessPath string, expiryBuffer time.Duration) *Config {
+func NewConfig(cliPath, profile, akeylessPath string, expiryBuffer time.Duration, debug bool) *Config {
 	return &Config{
 		CLIPath:      cliPath,
 		Profile:      profile,
 		AkeylessPath: akeylessPath,
 		ExpiryBuffer: expiryBuffer,
+		Debug:        debug,
 	}
 }
 
@@ -39,7 +41,7 @@ func NewConfigWithDefaults() *Config {
 	}
 	fmt.Println("Found Home Directory:", homeDir)
 	akeylessHomeDir := homeDir + "/.akeyless"
-	return NewConfig("", "default", akeylessHomeDir, 0)
+	return NewConfig("", "default", akeylessHomeDir, 0, false)
 }
 
 // LoadConfigFromEnv loads configuration options from environment variables.
@@ -65,6 +67,11 @@ func LoadConfigFromEnv(config *Config) {
 	}
 	if config.ExpiryBuffer == 0 {
 		config.ExpiryBuffer = DEFAULT_EXPIRY_BUFFER
+	}
+
+	debugStr := os.Getenv("SHELLER_DEBUG")
+	if debugStr != "" {
+		config.Debug = true
 	}
 }
 
@@ -123,6 +130,15 @@ func ValidateConfig(config *Config) error {
 			return errors.New("the profile file is not readable")
 		}
 		return err
+	}
+
+	if config.Debug {
+		fmt.Println("**DEBUG** Loaded configuration:")
+		fmt.Println("CLIPath:", config.CLIPath)
+		fmt.Println("Profile:", config.Profile)
+		fmt.Println("AkeylessPath:", config.AkeylessPath)
+		fmt.Println("ExpiryBuffer:", config.ExpiryBuffer)
+		fmt.Println("Debug:", config.Debug)
 	}
 
 	return nil

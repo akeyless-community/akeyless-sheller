@@ -1,6 +1,6 @@
 # Akeyless Sheller
 
-A Go library for simplifying the process of authenticating and managing tokens with the Akeyless CLI. This library handles token retrieval and management, ensuring tokens are reused when valid and only re-authenticating when necessary to reduce unnecessary user prompts.
+A Go library for simplifying the process of authenticating and managing tokens with the Akeyless CLI. This library handles token retrieval and management, ensuring tokens are reused when valid and only re-authenticating when necessary to reduce unnecessary user prompts while delegating the authentication process to the Akeyless CLI for maximum security and support for all authentication methods.
 
 ## Getting Started
 
