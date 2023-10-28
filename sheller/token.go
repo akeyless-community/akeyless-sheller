@@ -101,7 +101,7 @@ func ShellOutForNewToken(profile *Profile, config *Config) (*Token, error) {
 
 	// Construct the command string based on the profile and config
 	cmdStrBuilder := strings.Builder{}
-	fmt.Fprintf(&cmdStrBuilder, "%s auth", filepath.Join(config.CLIPath, "akeyless"))
+	fmt.Fprintf(&cmdStrBuilder, "%s auth", config.CLIPath)
 
 	// Iterate through the profile configuration and append properties to the command string
 	profileConfigTree := profileConfig.Get(profile.Name).(*toml.Tree)

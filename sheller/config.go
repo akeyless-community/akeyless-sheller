@@ -12,7 +12,7 @@ var DEFAULT_EXPIRY_BUFFER = 10 * time.Minute
 
 // Config holds the configuration options for the Sheller library.
 type Config struct {
-	CLIPath      string        // Path to the Akeyless CLI executable directory
+	CLIPath      string        // Path to the Akeyless CLI executable
 	Profile      string        // Name of the Akeyless CLI profile to use
 	AkeylessPath string        // Path to the .akeyless directory
 	ExpiryBuffer time.Duration // Buffer time before token expiry to trigger re-authentication
