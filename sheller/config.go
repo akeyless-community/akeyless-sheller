@@ -127,16 +127,16 @@ func InitializeLibrary(config *Config) error {
 
 	return nil
 }
+
 // InitializeAndGetToken initializes the library, gets the profile, and retrieves the token.
-func InitializeAndGetToken(cliPath, profile, akeylessPath string, expiryBuffer time.Duration) (*Token, error) {
-	config := NewConfig(cliPath, profile, akeylessPath, expiryBuffer)
+func InitializeAndGetToken(config *Config) (*Token, error) {
 	err := InitializeLibrary(config)
 	if err != nil {
 		return nil, err
 	}
-	profile, err := GetProfile(profile, config)
-	if err != nil {
-		return nil, err
+	profile, errProfile := GetProfile(config.Profile, config)
+	if errProfile != nil {
+		return nil, errProfile
 	}
 	token, err := GetToken(profile, config)
 	if err != nil {
