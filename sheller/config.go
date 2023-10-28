@@ -69,8 +69,32 @@ func ValidateConfig(config *Config) error {
 		return errors.New("the CLIPath does not lead to an executable file")
 	}
 
+	// Check if the AkeylessPath property is not empty
+	if config.AkeylessPath == "" {
+		return errors.New("the AkeylessPath is not set")
+	}
+
+	// Check if the AkeylessPath property leads to an existing directory
+	akeylessPathInfo, err := os.Stat(config.AkeylessPath)
+	if err != nil {
+		return err
+	}
+	if !akeylessPathInfo.IsDir() {
+		return errors.New("the AkeylessPath does not lead to a directory")
+	}
+
+	// Check if the profiles subdirectory exists inside the AkeylessPath directory
+	profilesDirPath := config.AkeylessPath + "/profiles"
+	profilesDirInfo, err := os.Stat(profilesDirPath)
+	if err != nil {
+		return err
+	}
+	if !profilesDirInfo.IsDir() {
+		return errors.New("the profiles subdirectory does not exist inside the AkeylessPath directory")
+	}
+
 	// Check if the profile file exists and is readable
-	profileFilePath := config.AkeylessPath + "/profiles/" + config.Profile + ".toml"
+	profileFilePath := profilesDirPath + "/" + config.Profile + ".toml"
 	_, err = os.Stat(profileFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
