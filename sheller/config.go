@@ -118,26 +118,20 @@ func ValidateConfig(config *Config) error {
 
 		akeylessHomeDir := filepath.Join(homeDir, ".akeyless")
 
-		akeylessHomeExists, homeExistsErrors := ValidateAkeylessHomeExists(akeylessHomeDir, "default")
-		if homeExistsErrors != nil {
-			return homeExistsErrors
-		}
-		if akeylessHomeExists {
-			if config.Debug {
-				fmt.Println("**DEBUG** Akeyless Home Directory exists")
-			}
-			config.AkeylessPath = akeylessHomeDir
-		} else {
-			return errors.New("the AkeylessPath is not set")
-		}
+	if err := ValidateAkeylessHomeExists(akeylessHomeDir, "default"); err != nil {
+		return err
+	}
+	if config.Debug {
+		fmt.Println("**DEBUG** Akeyless Home Directory exists")
+	}
+	config.AkeylessPath = akeylessHomeDir
 	}
 
 	// Check if the AkeylessPath property leads to an existing directory
 	// Check if the profiles subdirectory exists inside the AkeylessPath directory
 	// Check if the profile file exists and is readable
-	cliProfileExists, profileExistsErrors := ValidateAkeylessCliProfileExists(config.AkeylessPath, config.Profile)
-	if cliProfileExists {
-		return profileExistsErrors
+	if err := ValidateAkeylessCliProfileExists(config.AkeylessPath, config.Profile); err != nil {
+		return err
 	}
 
 	if config.Debug {
@@ -152,7 +146,7 @@ func ValidateConfig(config *Config) error {
 	return nil
 }
 
-func ValidateAkeylessHomeExists(akeylessHomeDir string, profileName string) (bool, error) {
+func ValidateAkeylessHomeExists(akeylessHomeDir string, profileName string) error {
 	akeylessPathInfo, err := os.Stat(akeylessHomeDir)
 	if err != nil {
 		return true, err
@@ -173,7 +167,7 @@ func ValidateAkeylessHomeExists(akeylessHomeDir string, profileName string) (boo
 	return false, nil
 }
 
-func ValidateAkeylessCliProfileExists(profilesDirPath string, profileName string) (bool, error) {
+func ValidateAkeylessCliProfileExists(profilesDirPath string, profileName string) error {
 	profileFilePath := filepath.Join(profilesDirPath, profileName + ".toml")
 	_, err := os.Stat(profileFilePath)
 	if err != nil {
