@@ -90,7 +90,7 @@ func ValidateConfig(config *Config) error {
 		return err
 	}
 	if !profilesDirInfo.IsDir() {
-		return errors.New("the profiles subdirectory does not exist inside the AkeylessPath directory")
+		return errors.New("the profiles subdirectory does not exist inside the AkeylessPath directory meaning that the AkeylessPath is likely not a valid Akeyless home directory")
 	}
 
 	// Check if the profile file exists and is readable
