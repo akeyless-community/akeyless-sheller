@@ -41,23 +41,25 @@ func LoadConfigFromEnv() *Config {
 
 // InitializeLibrary initializes the Sheller library with the provided configuration.
 func InitializeLibrary(config *Config) error {
-	// If any property of the Config struct is empty, load it from the environment variable.
-	if config.CLIPath == "" {
-		config.CLIPath = os.Getenv("SHELLER_CLI_PATH")
+	// Load each property from the environment variable, overriding the existing value in the Config struct.
+	cliPath := os.Getenv("SHELLER_CLI_PATH")
+	if cliPath != "" {
+		config.CLIPath = cliPath
 	}
-	if config.Profile == "" {
-		config.Profile = os.Getenv("SHELLER_PROFILE")
+	profile := os.Getenv("SHELLER_PROFILE")
+	if profile != "" {
+		config.Profile = profile
 	}
-	if config.AkeylessPath == "" {
-		config.AkeylessPath = os.Getenv("SHELLER_AKEYLESS_HOME_DIRECTORY_PATH")
+	akeylessPath := os.Getenv("SHELLER_AKEYLESS_HOME_DIRECTORY_PATH")
+	if akeylessPath != "" {
+		config.AkeylessPath = akeylessPath
 	}
-	if config.ExpiryBuffer == 0 {
-		expiryBufferStr := os.Getenv("SHELLER_EXPIRY_BUFFER")
+	expiryBufferStr := os.Getenv("SHELLER_EXPIRY_BUFFER")
+	if expiryBufferStr != "" {
 		expiryBuffer, err := time.ParseDuration(expiryBufferStr)
-		if err != nil {
-			expiryBuffer = 10 * time.Minute // Default value of 10 minutes
+		if err == nil {
+			config.ExpiryBuffer = expiryBuffer
 		}
-		config.ExpiryBuffer = expiryBuffer
 	}
 
 	// TODO: Validate the configuration.
