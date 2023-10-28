@@ -22,6 +22,11 @@ type Config struct {
 }
 
 // NewConfig creates a new Config instance with the provided parameters.
+// cliPath: Path to the Akeyless CLI executable
+// profile: Name of the Akeyless CLI profile to use
+// akeylessPath: Path to the .akeyless directory
+// expiryBuffer: Buffer time before token expiry to trigger re-authentication
+// debug: Debug flag to enable or disable debug logging
 func NewConfig(cliPath, profile, akeylessPath string, expiryBuffer time.Duration, debug bool) *Config {
 	return &Config{
 		CLIPath:      cliPath,
@@ -32,8 +37,8 @@ func NewConfig(cliPath, profile, akeylessPath string, expiryBuffer time.Duration
 	}
 }
 
-// NewConfigWithDefaults creates a new Config instance with default values like
-// pulling the CLIPath from the system path and using the "default" CLI profile
+// NewConfigWithDefaults creates a new Config instance with default values.
+// It pulls the CLIPath from the system path and uses the "default" CLI profile.
 func NewConfigWithDefaults() *Config {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -46,6 +51,7 @@ func NewConfigWithDefaults() *Config {
 }
 
 // LoadConfigFromEnv loads configuration options from environment variables.
+// It updates the provided config object with values from the environment.
 func LoadConfigFromEnv(config *Config) {
 	cliPath := os.Getenv("SHELLER_CLI_PATH")
 	if cliPath != "" {
@@ -77,6 +83,7 @@ func LoadConfigFromEnv(config *Config) {
 }
 
 // ValidateConfig validates the provided configuration.
+// It checks if the CLIPath, Profile, and AkeylessPath are set correctly and if the files and directories they point to exist and are accessible.
 func ValidateConfig(config *Config) error {
 	if config.CLIPath == "" {
 		akeylessFound := which.Which("akeyless")
@@ -183,6 +190,7 @@ func ValidateAkeylessCliProfileExists(profilesDirPath string, profileName string
 }
 
 // InitializeLibrary initializes the Sheller library with the provided configuration.
+// It loads the configuration from environment variables and validates it.
 func InitializeLibrary(config *Config) error {
 	// Load configuration from environment variables
 	LoadConfigFromEnv(config)
@@ -197,6 +205,7 @@ func InitializeLibrary(config *Config) error {
 }
 
 // InitializeAndGetToken initializes the library, gets the profile, and retrieves the token.
+// It returns the retrieved token or an error if something went wrong.
 func InitializeAndGetToken(config *Config) (*Token, error) {
 	err := InitializeLibrary(config)
 	if err != nil {
