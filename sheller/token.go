@@ -15,9 +15,21 @@ import (
 
 // Token holds the details of an authentication token.
 type Token struct {
-	AccessID string    `json:"access_id"`
-	Token    string    `json:"token"`
-	Expiry   time.Time `json:"expiry"`
+	AccessID  string    `json:"access_id"`
+	Token     string    `json:"token"`
+	Expiry    time.Time `json:"expiry"`
+	AuthCreds string    `json:"auth_creds"`
+	UamCreds  string    `json:"uam_creds"`
+	KfmCreds  string    `json:"kfm_creds"`
+}
+
+type rawToken struct {
+	AccessID  string `json:"access_id"`
+	Token     string `json:"token"`
+	Expiry    int64 `json:"expiry"`
+	AuthCreds string `json:"auth_creds"`
+	UamCreds  string `json:"uam_creds"`
+	KfmCreds  string `json:"kfm_creds"`
 }
 
 // CheckForExistingToken checks for an existing valid token for the specified profile.
@@ -30,7 +42,10 @@ func CheckForExistingToken(profile *Profile, config *Config) (*Token, error) {
 
 	for _, file := range files {
 		if !file.IsDir() && filepath.Ext(file.Name()) == "" { // Assuming token files have no extension
-			token, err := ParseTokenFile(filepath.Join(tokenFilesPath, file.Name()))
+			// get file name
+			fileName := file.Name()
+			fullPath := filepath.Join(tokenFilesPath, fileName)
+			token, err := ParseTokenFile(fullPath)
 			if err != nil {
 				return nil, err
 			}
@@ -52,10 +67,19 @@ func ParseTokenFile(path string) (*Token, error) {
 		return nil, err
 	}
 
-	token := &Token{}
-	err = json.Unmarshal(data, token)
+	var raw rawToken
+	err = json.Unmarshal(data, &raw)
 	if err != nil {
 		return nil, err
+	}
+
+	token := &Token{
+		AccessID:  raw.AccessID,
+		Token:     raw.Token,
+		Expiry:    time.Unix(raw.Expiry, 0),
+		AuthCreds: raw.AuthCreds,
+		UamCreds:  raw.UamCreds,
+		KfmCreds:  raw.KfmCreds,
 	}
 
 	return token, nil
@@ -88,6 +112,9 @@ func ShellOutForNewToken(profile *Profile, config *Config) (*Token, error) {
 	}
 
 	cmdStr := cmdStrBuilder.String()
+
+	// append command to only return the token
+	cmdStr = cmdStr + " --json --jq-expression .token"
 
 	cmdParts := strings.Fields(cmdStr)
 
