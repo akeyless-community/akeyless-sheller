@@ -10,6 +10,33 @@ A Go library for simplifying the process of authenticating and managing tokens w
 go get github.com/akeyless-community/akeyless-sheller/sheller
 ```
 
+## Sequence Diagram
+
+The following sequence diagram provides an overview of how the `sheller` library operates:
+
+```mermaid
+sequenceDiagram
+    participant Client as Client Code
+    participant Sheller as Sheller Library
+    participant ProfileManager as Profile Manager
+    participant TokenManager as Token Manager
+    participant CLI as Akeyless CLI
+
+    Client->>Sheller: InitializeLibrary(config)
+    Sheller->>ProfileManager: GetProfile(config.profileName)
+    ProfileManager->>Sheller: Return profile
+    Client->>Sheller: GetToken(profile)
+    Sheller->>TokenManager: Check for existing token
+    alt Token exists and is valid
+        TokenManager->>Sheller: Return existing token
+    else Token doesn't exist or is invalid
+        TokenManager->>CLI: ShellOutForNewToken(profile)
+        CLI->>TokenManager: Return new token
+    end
+    TokenManager->>Sheller: Return token
+    Sheller->>Client: Return token
+```
+
 ## Example Quickstart
 
 The following code snippet provides a quickstart example of how to use the `sheller` library to obtain a token for a specified profile:
