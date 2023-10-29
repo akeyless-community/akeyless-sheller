@@ -126,9 +126,9 @@ func main() {
 
 ## Library Structure
 
-- `sheller/config.go`: Defines the configuration structure and provides a function to initialize the library.
-- `sheller/profile.go`: Provides functions to load and list Akeyless CLI profiles.
-- `sheller/token.go`: Provides functions to check for existing tokens, shell out for new tokens, and retrieve tokens for specified profiles.
+- `sheller/config.go`: Configuration Manager: Defines the configuration structure and provides a function to initialize the library.
+- `sheller/profile.go`: Profile Manager: Provides functions to load and list Akeyless CLI profiles.
+- `sheller/token.go`: Token Manager: Provides functions to check for existing tokens, shell out for new tokens, and retrieve tokens for specified profiles.
 
 ## Testing
 
