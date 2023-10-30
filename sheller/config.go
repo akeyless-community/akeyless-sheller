@@ -53,19 +53,19 @@ func NewConfigWithDefaults() *Config {
 // LoadConfigFromEnv loads configuration options from environment variables.
 // It updates the provided config object with values from the environment.
 func LoadConfigFromEnv(config *Config) {
-	cliPath := os.Getenv("SHELLER_CLI_PATH")
+	cliPath := os.Getenv("AKEYLESS_SHELLER_CLI_PATH")
 	if cliPath != "" {
 		config.CLIPath = cliPath
 	}
-	profile := os.Getenv("SHELLER_PROFILE")
+	profile := os.Getenv("AKEYLESS_SHELLER_PROFILE")
 	if profile != "" {
 		config.Profile = profile
 	}
-	akeylessPath := os.Getenv("SHELLER_AKEYLESS_HOME_DIRECTORY_PATH")
+	akeylessPath := os.Getenv("AKEYLESS_SHELLER_HOME_DIRECTORY_PATH")
 	if akeylessPath != "" {
 		config.AkeylessPath = akeylessPath
 	}
-	expiryBufferStr := os.Getenv("SHELLER_EXPIRY_BUFFER")
+	expiryBufferStr := os.Getenv("AKEYLESS_SHELLER_EXPIRY_BUFFER")
 	if expiryBufferStr != "" {
 		expiryBuffer, err := time.ParseDuration(expiryBufferStr)
 		if err == nil {
@@ -76,7 +76,7 @@ func LoadConfigFromEnv(config *Config) {
 		config.ExpiryBuffer = DEFAULT_EXPIRY_BUFFER
 	}
 
-	debugStr := os.Getenv("SHELLER_DEBUG")
+	debugStr := os.Getenv("AKEYLESS_SHELLER_DEBUG")
 	if debugStr != "" {
 		config.Debug = true
 	}
