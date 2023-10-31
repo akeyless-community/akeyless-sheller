@@ -45,7 +45,7 @@ sequenceDiagram
 - Akeyless CLI has a `default` profile configured
 - The Akeyless home directory exists at `~/.akeyless/` (created through the Akeyless CLI initialization)
 
-## Quickstart Code Example
+### Quickstart Code Example
 
 The following code snippet provides a quickstart example of how to use the `sheller` library to obtain a token for a specified profile:
 
@@ -78,7 +78,7 @@ func main() {
 
 ## Example Full Implementation
 
-### 
+### Full Implementation Explanation
 
 The `main.go` file in the root directory serves as an example quickstart implementation of the `sheller` library. Below is a brief explanation of how the full example operates:
 
@@ -88,7 +88,7 @@ The `main.go` file in the root directory serves as an example quickstart impleme
 4. Obtain a token for the specified profile using `sheller.GetToken`.
 5. Print the obtained token to the console.
 
-### Full Code Example
+### Full Implementation Code Example
 
 ```go
 package main
