@@ -18,8 +18,8 @@ The following sequence diagram provides an overview of how the `sheller` library
 sequenceDiagram
     participant Client as Client Code
     participant Sheller as Sheller Library
-    participant ProfileManager as Profile Manager
-    participant TokenManager as Token Manager
+    participant ProfileManager as Sheller: Profile Manager
+    participant TokenManager as Sheller: Token Manager
     participant CLI as Akeyless CLI
 
     Client->>Sheller: InitializeLibrary(config)
