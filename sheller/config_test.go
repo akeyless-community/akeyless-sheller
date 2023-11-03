@@ -104,7 +104,26 @@ func TestValidateConfig(t *testing.T) {
 }
 
 func TestValidateAkeylessHomeDirectoryExists(t *testing.T) {
-	// Test cases to be added
+	// Test case 1: Valid Akeyless home directory
+	akeylessHomeDir1 := "/path/to/valid/akeyless/home/directory"
+	err := ValidateAkeylessHomeDirectoryExists(akeylessHomeDir1, "default")
+	if err != nil {
+		t.Errorf("Expected no error, but got %v", err)
+	}
+
+	// Test case 2: Invalid Akeyless home directory (directory does not exist)
+	akeylessHomeDir2 := "/path/to/nonexistent/directory"
+	err = ValidateAkeylessHomeDirectoryExists(akeylessHomeDir2, "default")
+	if err == nil {
+		t.Errorf("Expected error, but got none")
+	}
+
+	// Test case 3: Invalid Akeyless home directory (not a directory)
+	akeylessHomeDir3 := "/path/to/file/not/directory"
+	err = ValidateAkeylessHomeDirectoryExists(akeylessHomeDir3, "default")
+	if err == nil {
+		t.Errorf("Expected error, but got none")
+	}
 }
 
 func TestValidateAkeylessCliProfileExists(t *testing.T) {
