@@ -46,7 +46,30 @@ func TestNewConfigWithDefaults(t *testing.T) {
 }
 
 func TestLoadConfigFromEnv(t *testing.T) {
-	// Test cases to be added
+	os.Setenv("AKEYLESS_SHELLER_CLI_PATH", "/path/to/cli")
+	os.Setenv("AKEYLESS_SHELLER_PROFILE", "testProfile")
+	os.Setenv("AKEYLESS_SHELLER_HOME_DIRECTORY_PATH", "/path/to/akeyless")
+	os.Setenv("AKEYLESS_SHELLER_EXPIRY_BUFFER", "10m")
+	os.Setenv("AKEYLESS_SHELLER_DEBUG", "true")
+
+	config := NewConfig("", "", "", 0, false)
+	LoadConfigFromEnv(config)
+
+	if config.CLIPath != "/path/to/cli" {
+		t.Errorf("Expected CLIPath to be '/path/to/cli', but got %s", config.CLIPath)
+	}
+	if config.Profile != "testProfile" {
+		t.Errorf("Expected Profile to be 'testProfile', but got %s", config.Profile)
+	}
+	if config.AkeylessPath != "/path/to/akeyless" {
+		t.Errorf("Expected AkeylessPath to be '/path/to/akeyless', but got %s", config.AkeylessPath)
+	}
+	if config.ExpiryBuffer != 10*time.Minute {
+		t.Errorf("Expected ExpiryBuffer to be 10m, but got %s", config.ExpiryBuffer)
+	}
+	if config.Debug != true {
+		t.Errorf("Expected Debug to be true, but got %v", config.Debug)
+	}
 }
 
 func TestValidateConfig(t *testing.T) {
