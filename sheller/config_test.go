@@ -127,7 +127,29 @@ func TestValidateAkeylessHomeDirectoryExists(t *testing.T) {
 }
 
 func TestValidateAkeylessCliProfileExists(t *testing.T) {
-	// Test cases to be added
+	// Test case 1: Valid profile file
+	profilesDir1 := "/path/to/valid/profiles/directory"
+	profileName1 := "validProfile"
+	err := ValidateAkeylessCliProfileExists(profilesDir1, profileName1)
+	if err != nil {
+		t.Errorf("Expected no error, but got %v", err)
+	}
+
+	// Test case 2: Profile file does not exist
+	profilesDir2 := "/path/to/valid/profiles/directory"
+	profileName2 := "nonexistentProfile"
+	err = ValidateAkeylessCliProfileExists(profilesDir2, profileName2)
+	if err == nil {
+		t.Errorf("Expected error, but got none")
+	}
+
+	// Test case 3: Profile file is not readable
+	profilesDir3 := "/path/to/valid/profiles/directory"
+	profileName3 := "unreadableProfile"
+	err = ValidateAkeylessCliProfileExists(profilesDir3, profileName3)
+	if err == nil {
+		t.Errorf("Expected error, but got none")
+	}
 }
 
 func TestInitializeLibrary(t *testing.T) {
