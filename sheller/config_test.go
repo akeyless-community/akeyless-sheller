@@ -130,7 +130,10 @@ func TestValidateAkeylessCliProfileExists(t *testing.T) {
 	// Test case 1: Valid profile file
 	profilesDir1 := "/path/to/valid/profiles/directory"
 	profileName1 := "validProfile"
-	err := ValidateAkeylessCliProfileExists(profilesDir1, profileName1)
+	mockOS := new(MockOSWrapper)
+	mockOS.EXPECT().Stat(gomock.Any()).Return(nil, nil).Times(1)
+	config := &Config{OS: mockOS}
+	err := config.ValidateAkeylessCliProfileExists(profilesDir1, profileName1)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
 	}
