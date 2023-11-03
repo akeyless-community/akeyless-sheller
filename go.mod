@@ -8,6 +8,6 @@ require (
 )
 
 require (
-	github.com/spf13/afero v1.3.3 // indirect
-	golang.org/x/text v0.3.0 // indirect
+	github.com/spf13/afero v1.10.0 // indirect
+	golang.org/x/text v0.3.7 // indirect
 )
