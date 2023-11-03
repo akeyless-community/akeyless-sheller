@@ -10,6 +10,16 @@ This Go library streamlines the process of handling authentication and managing 
 go get github.com/akeyless-community/akeyless-sheller/sheller
 ```
 
+2. **Environment Variables:**
+
+The library can be configured using the following environment variables:
+
+- `AKEYLESS_SHELLER_CLI_PATH`: Path to the Akeyless CLI executable
+- `AKEYLESS_SHELLER_PROFILE`: Name of the Akeyless CLI profile to use
+- `AKEYLESS_SHELLER_HOME_DIRECTORY_PATH`: Path to the .akeyless directory
+- `AKEYLESS_SHELLER_EXPIRY_BUFFER`: Buffer time before token expiry to trigger re-authentication (in Go duration format, e.g., "10m" for 10 minutes)
+- `AKEYLESS_SHELLER_DEBUG`: Debug flag to enable or disable debug logging (set to any value to enable)
+
 ## Sequence Diagram
 
 The following sequence diagram provides an overview of how the `sheller` library operates:
