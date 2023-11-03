@@ -1,6 +1,7 @@
 package sheller
 
 import (
+	"os"
 	"testing"
 	"time"
 )
