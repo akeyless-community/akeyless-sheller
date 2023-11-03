@@ -104,7 +104,7 @@ func ValidateConfig(config *Config) error {
 	}
 
 	// Check if the CLIPath is an executable file
-	fileInfo, err := config.OS.Stat(config.CLIPath)
+	fileInfo, err := os.Stat(config.CLIPath)
 	if err != nil {
 		return err
 	}
@@ -154,7 +154,7 @@ func ValidateConfig(config *Config) error {
 }
 
 func ValidateAkeylessHomeDirectoryExists(akeylessHomeDir string, profileName string) error {
-	akeylessPathInfo, err := config.OS.Stat(akeylessHomeDir)
+	akeylessPathInfo, err := os.Stat(akeylessHomeDir)
 	if err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func ValidateAkeylessHomeDirectoryExists(akeylessHomeDir string, profileName str
 	}
 
 	profilesDirPath := filepath.Join(akeylessHomeDir, "profiles")
-	profilesDirInfo, err := config.OS.Stat(profilesDirPath)
+	profilesDirInfo, err := os.Stat(profilesDirPath)
 	if err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func ValidateAkeylessHomeDirectoryExists(akeylessHomeDir string, profileName str
 
 func ValidateAkeylessCliProfileExists(profilesDirPath string, profileName string) error {
 	profileFilePath := filepath.Join(profilesDirPath, profileName + ".toml")
-	_, err := config.OS.Stat(profileFilePath)
+	_, err := os.Stat(profileFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("the profile file does not exist")
