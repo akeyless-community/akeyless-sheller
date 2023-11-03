@@ -74,7 +74,33 @@ func TestLoadConfigFromEnv(t *testing.T) {
 }
 
 func TestValidateConfig(t *testing.T) {
-	// Test cases to be added
+	// Test case 1: Valid configuration
+	config1 := NewConfig("/path/to/cli", "testProfile", "/path/to/akeyless", 10*time.Minute, true)
+	err := ValidateConfig(config1)
+	if err != nil {
+		t.Errorf("Expected no error, but got %v", err)
+	}
+
+	// Test case 2: Invalid CLIPath
+	config2 := NewConfig("", "testProfile", "/path/to/akeyless", 10*time.Minute, true)
+	err = ValidateConfig(config2)
+	if err == nil {
+		t.Errorf("Expected error, but got none")
+	}
+
+	// Test case 3: Invalid Profile
+	config3 := NewConfig("/path/to/cli", "", "/path/to/akeyless", 10*time.Minute, true)
+	err = ValidateConfig(config3)
+	if err == nil {
+		t.Errorf("Expected error, but got none")
+	}
+
+	// Test case 4: Invalid AkeylessPath
+	config4 := NewConfig("/path/to/cli", "testProfile", "", 10*time.Minute, true)
+	err = ValidateConfig(config4)
+	if err == nil {
+		t.Errorf("Expected error, but got none")
+	}
 }
 
 func TestValidateAkeylessHomeDirectoryExists(t *testing.T) {
