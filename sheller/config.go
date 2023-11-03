@@ -3,7 +3,7 @@ package sheller
 import (
 	"errors"
 	"fmt"
-	"os"
+	"github.com/spf13/afero"
 	"path/filepath"
 	"time"
 
@@ -40,7 +40,7 @@ func NewConfig(cliPath, profile, akeylessPath string, expiryBuffer time.Duration
 // NewConfigWithDefaults creates a new Config instance with default values.
 // It pulls the CLIPath from the system path and uses the "default" CLI profile.
 func NewConfigWithDefaults() *Config {
-	homeDir, err := os.UserHomeDir()
+	homeDir, err := afero.UserHomeDir()
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -53,7 +53,7 @@ func NewConfigWithDefaults() *Config {
 // LoadConfigFromEnv loads configuration options from environment variables.
 // It updates the provided config object with values from the environment.
 func LoadConfigFromEnv(config *Config) {
-	cliPath := os.Getenv("AKEYLESS_SHELLER_CLI_PATH")
+	cliPath := afero.Getenv("AKEYLESS_SHELLER_CLI_PATH")
 	if cliPath != "" {
 		config.CLIPath = cliPath
 	}
@@ -104,7 +104,7 @@ func ValidateConfig(config *Config) error {
 	}
 
 	// Check if the CLIPath is an executable file
-	fileInfo, err := os.Stat(config.CLIPath)
+	fileInfo, err := afero.Stat(config.CLIPath)
 	if err != nil {
 		return err
 	}
@@ -154,7 +154,7 @@ func ValidateConfig(config *Config) error {
 }
 
 func ValidateAkeylessHomeDirectoryExists(akeylessHomeDir string, profileName string) error {
-	akeylessPathInfo, err := os.Stat(akeylessHomeDir)
+	akeylessPathInfo, err := afero.Stat(akeylessHomeDir)
 	if err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func ValidateAkeylessHomeDirectoryExists(akeylessHomeDir string, profileName str
 	}
 
 	profilesDirPath := filepath.Join(akeylessHomeDir, "profiles")
-	profilesDirInfo, err := os.Stat(profilesDirPath)
+	profilesDirInfo, err := afero.Stat(profilesDirPath)
 	if err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func ValidateAkeylessHomeDirectoryExists(akeylessHomeDir string, profileName str
 
 func ValidateAkeylessCliProfileExists(profilesDirPath string, profileName string) error {
 	profileFilePath := filepath.Join(profilesDirPath, profileName + ".toml")
-	_, err := os.Stat(profileFilePath)
+	_, err := afero.Stat(profileFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("the profile file does not exist")
