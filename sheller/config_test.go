@@ -32,7 +32,17 @@ func TestNewConfig(t *testing.T) {
 }
 
 func TestNewConfigWithDefaults(t *testing.T) {
-	// Test cases to be added
+	config := NewConfigWithDefaults()
+
+	if config.Profile != "default" {
+		t.Errorf("Expected Profile to be 'default', but got %s", config.Profile)
+	}
+	if config.ExpiryBuffer != 0 {
+		t.Errorf("Expected ExpiryBuffer to be 0, but got %s", config.ExpiryBuffer)
+	}
+	if config.Debug != false {
+		t.Errorf("Expected Debug to be false, but got %v", config.Debug)
+	}
 }
 
 func TestLoadConfigFromEnv(t *testing.T) {
