@@ -3,14 +3,17 @@ package sheller
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/afero"
+	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/spf13/afero"
 
 	"github.com/hairyhenderson/go-which"
 )
 
 var DEFAULT_EXPIRY_BUFFER = 10 * time.Minute
+var fs = afero.NewOsFs()
 
 // Config holds the configuration options for the Sheller library.
 type Config struct {
@@ -19,6 +22,7 @@ type Config struct {
 	AkeylessPath string        // Path to the .akeyless directory
 	ExpiryBuffer time.Duration // Buffer time before token expiry to trigger re-authentication
 	Debug        bool          // Debug flag to enable or disable debug logging
+	AppFs        *afero.Afero      // Filesystem to use to enable mocking of the filesystem
 }
 
 // NewConfig creates a new Config instance with the provided parameters.
@@ -28,19 +32,21 @@ type Config struct {
 // expiryBuffer: Buffer time before token expiry to trigger re-authentication
 // debug: Debug flag to enable or disable debug logging
 func NewConfig(cliPath, profile, akeylessPath string, expiryBuffer time.Duration, debug bool) *Config {
+	afc := &afero.Afero{Fs: fs}
 	return &Config{
 		CLIPath:      cliPath,
 		Profile:      profile,
 		AkeylessPath: akeylessPath,
 		ExpiryBuffer: expiryBuffer,
 		Debug:        debug,
+		AppFs:        afc,
 	}
 }
 
 // NewConfigWithDefaults creates a new Config instance with default values.
 // It pulls the CLIPath from the system path and uses the "default" CLI profile.
 func NewConfigWithDefaults() *Config {
-	homeDir, err := afero.UserHomeDir()
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -53,7 +59,7 @@ func NewConfigWithDefaults() *Config {
 // LoadConfigFromEnv loads configuration options from environment variables.
 // It updates the provided config object with values from the environment.
 func LoadConfigFromEnv(config *Config) {
-	cliPath := afero.Getenv("AKEYLESS_SHELLER_CLI_PATH")
+	cliPath := os.Getenv("AKEYLESS_SHELLER_CLI_PATH")
 	if cliPath != "" {
 		config.CLIPath = cliPath
 	}
@@ -95,7 +101,7 @@ func ValidateConfig(config *Config) error {
 	}
 
 	if config.Profile == "" {
-		cliProfileExistsError := ValidateAkeylessCliProfileExists(config.AkeylessPath, "default")
+		cliProfileExistsError := ValidateAkeylessCliProfileExists(config, "default")
 		if cliProfileExistsError == nil {
 			config.Profile = "default"
 		} else {
@@ -104,7 +110,7 @@ func ValidateConfig(config *Config) error {
 	}
 
 	// Check if the CLIPath is an executable file
-	fileInfo, err := afero.Stat(config.CLIPath)
+	fileInfo, err := config.AppFs.Stat(config.CLIPath)
 	if err != nil {
 		return err
 	}
@@ -125,19 +131,19 @@ func ValidateConfig(config *Config) error {
 
 		akeylessHomeDir := filepath.Join(homeDir, ".akeyless")
 
-	if err := ValidateAkeylessHomeDirectoryExists(akeylessHomeDir, "default"); err != nil {
-		return err
-	}
-	if config.Debug {
-		fmt.Println("**DEBUG** Akeyless Home Directory exists")
-	}
-	config.AkeylessPath = akeylessHomeDir
+		if err := ValidateAkeylessHomeDirectoryExists(config); err != nil {
+			return err
+		}
+		if config.Debug {
+			fmt.Println("**DEBUG** Akeyless Home Directory exists")
+		}
+		config.AkeylessPath = akeylessHomeDir
 	}
 
 	// Check if the AkeylessPath property leads to an existing directory
 	// Check if the profiles subdirectory exists inside the AkeylessPath directory
 	// Check if the profile file exists and is readable
-	if err := ValidateAkeylessCliProfileExists(config.AkeylessPath, config.Profile); err != nil {
+	if err := ValidateAkeylessCliProfileExists(config, config.Profile); err != nil {
 		return err
 	}
 
@@ -153,8 +159,8 @@ func ValidateConfig(config *Config) error {
 	return nil
 }
 
-func ValidateAkeylessHomeDirectoryExists(akeylessHomeDir string, profileName string) error {
-	akeylessPathInfo, err := afero.Stat(akeylessHomeDir)
+func ValidateAkeylessHomeDirectoryExists(config *Config) error {
+	akeylessPathInfo, err := config.AppFs.Stat(config.AkeylessPath)
 	if err != nil {
 		return err
 	}
@@ -162,21 +168,25 @@ func ValidateAkeylessHomeDirectoryExists(akeylessHomeDir string, profileName str
 		return errors.New("the AkeylessPath does not lead to a directory")
 	}
 
-	profilesDirPath := filepath.Join(akeylessHomeDir, "profiles")
-	profilesDirInfo, err := afero.Stat(profilesDirPath)
+	profilesDirPath := filepath.Join(config.AkeylessPath, "profiles")
+	profilesDirInfo, err := config.AppFs.Stat(profilesDirPath)
 	if err != nil {
 		return err
 	}
 	if !profilesDirInfo.IsDir() {
 		return errors.New("the profiles subdirectory does not exist inside the AkeylessPath directory meaning that the AkeylessPath is likely not a valid Akeyless home directory")
 	}
-	
+
 	return nil
 }
 
-func ValidateAkeylessCliProfileExists(profilesDirPath string, profileName string) error {
-	profileFilePath := filepath.Join(profilesDirPath, profileName + ".toml")
-	_, err := afero.Stat(profileFilePath)
+func ValidateAkeylessCliProfileExists(config *Config, name string) error {
+	// if name is empty, use the profile name from the config
+	if name == "" {
+		name = config.Profile
+	}
+	profileFilePath := filepath.Join(config.AkeylessPath, name+".toml")
+	_, err := config.AppFs.Stat(profileFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("the profile file does not exist")

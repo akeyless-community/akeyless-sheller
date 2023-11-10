@@ -4,6 +4,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/spf13/afero"
 )
 
 func TestNewConfig(t *testing.T) {
@@ -74,8 +76,19 @@ func TestLoadConfigFromEnv(t *testing.T) {
 }
 
 func TestValidateConfig(t *testing.T) {
+	var mockFs = afero.NewMemMapFs()
+	var mockAfero = &afero.Afero{Fs: mockFs}
 	// Test case 1: Valid configuration
 	config1 := NewConfig("/path/to/cli", "testProfile", "/path/to/akeyless", 10*time.Minute, true)
+	// Set up mock file system
+	// mock path to CLI that is executable
+	mockFs.MkdirAll("/path/to/cli", 0755)
+	// mock path to Akeyless home directory that is a directory
+	mockFs.MkdirAll("/path/to/akeyless/", 0755)
+	// mock path to the profile inside the Akeyless home directory that is a file
+	mockFs.MkdirAll("/path/to/akeyless/testProfile.toml", 0444)
+	config1.AppFs = mockAfero
+
 	err := ValidateConfig(config1)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)

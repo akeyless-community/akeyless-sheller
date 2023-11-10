@@ -2,7 +2,6 @@ package sheller
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/pelletier/go-toml"
@@ -19,7 +18,7 @@ type Profile struct {
 // GetProfile loads the specified profile from the .akeyless/profiles directory.
 func GetProfile(name string, config *Config) (*Profile, error) {
 	profilePath := filepath.Join(config.AkeylessPath, "profiles", fmt.Sprintf("%s.toml", name))
-	profileData, err := os.ReadFile(profilePath)
+	profileData, err := config.AppFs.ReadFile(profilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +36,7 @@ func GetProfile(name string, config *Config) (*Profile, error) {
 // ListProfiles lists all profiles in the .akeyless/profiles directory.
 func ListProfiles(config *Config) ([]Profile, error) {
 	profilesDir := filepath.Join(config.AkeylessPath, "profiles")
-	files, err := os.ReadDir(profilesDir) // Updated to use os.ReadDir
+	files, err := config.AppFs.ReadDir(profilesDir) // Updated to use config.AppFs.ReadDir
 	if err != nil {
 		return nil, err
 	}
