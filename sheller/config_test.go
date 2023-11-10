@@ -121,9 +121,15 @@ func TestValidateAkeylessHomeDirectoryExists(t *testing.T) {
 	var mockAfero = &afero.Afero{Fs: mockFs}
 
 	// Test case 1: Valid Akeyless home directory
-	mockFs.MkdirAll("/path/to/valid/akeyless/home/directory", 0755)
-	config1 := NewConfig("", "", "/path/to/valid/akeyless/home/directory", 0, false)
+	homeDirPath := "/path/to/valid/akeyless/home/directory"
+	mockFs.MkdirAll(homeDirPath, 0755)
+	// create the profiles directory and a default profile
+	mockFs.MkdirAll(homeDirPath+"/profiles", 0755)
+	mockFs.Create(homeDirPath + "/profiles/default.toml")
+
+	config1 := NewConfig("", "", homeDirPath, 0, false)
 	config1.AppFs = mockAfero
+	
 	err := ValidateAkeylessHomeDirectoryExists(config1)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
@@ -157,7 +163,6 @@ func TestValidateAkeylessCliProfileExists(t *testing.T) {
 	profilesDir1 := "/path/to/valid/profiles/directory"
 	profileName1 := "validProfile"
 	mockFs.MkdirAll(profilesDir1, 0755)
-	mockFs.WriteFile(filepath.Join(profilesDir1, profileName1+".toml"), []byte("content"), 0644)
 	config1 := NewConfig("", "", profilesDir1, 0, false)
 	config1.AppFs = mockAfero
 	err := ValidateAkeylessCliProfileExists(config1, profileName1)
@@ -176,7 +181,6 @@ func TestValidateAkeylessCliProfileExists(t *testing.T) {
 
 	// Test case 3: Profile file is not readable
 	profileName3 := "unreadableProfile"
-	mockFs.WriteFile(filepath.Join(profilesDir1, profileName3+".toml"), []byte("content"), 0000)
 	config3 := NewConfig("", "", profilesDir1, 0, false)
 	config3.AppFs = mockAfero
 	err = ValidateAkeylessCliProfileExists(config3, profileName3)
