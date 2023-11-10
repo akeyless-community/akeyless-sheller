@@ -22,7 +22,7 @@ type Config struct {
 	AkeylessPath string        // Path to the .akeyless directory
 	ExpiryBuffer time.Duration // Buffer time before token expiry to trigger re-authentication
 	Debug        bool          // Debug flag to enable or disable debug logging
-	AppFs        *afero.Afero      // Filesystem to use to enable mocking of the filesystem
+	AppFs        *afero.Afero  // Filesystem to use to enable mocking of the filesystem
 }
 
 // NewConfig creates a new Config instance with the provided parameters.
@@ -185,14 +185,14 @@ func ValidateAkeylessCliProfileExists(config *Config, name string) error {
 	if name == "" {
 		name = config.Profile
 	}
-	profileFilePath := filepath.Join(config.AkeylessPath, name+".toml")
+	profileFilePath := filepath.Join(config.AkeylessPath, "profiles", name+".toml")
 	_, err := config.AppFs.Stat(profileFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return errors.New("the profile file does not exist")
+			return errors.New("the profile file " + profileFilePath + " does not exist")
 		}
 		if os.IsPermission(err) {
-			return errors.New("the profile file is not readable")
+			return errors.New("the profile file " + profileFilePath + " is not readable")
 		}
 		return err
 	}
