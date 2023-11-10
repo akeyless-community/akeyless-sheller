@@ -86,7 +86,8 @@ func TestValidateConfig(t *testing.T) {
 	// mock path to Akeyless home directory that is a directory
 	mockFs.MkdirAll("/path/to/akeyless/", 0755)
 	// mock path to the profile inside the Akeyless home directory that is a file
-	mockFs.MkdirAll("/path/to/akeyless/testProfile.toml", 0444)
+	mockFs.MkdirAll("/path/to/akeyless/profiles", 0444)
+	mockFs.Create("/path/to/akeyless/profiles/testProfile.toml")
 	config1.AppFs = mockAfero
 
 	err := ValidateConfig(config1)
@@ -129,7 +130,7 @@ func TestValidateAkeylessHomeDirectoryExists(t *testing.T) {
 
 	config1 := NewConfig("", "", homeDirPath, 0, false)
 	config1.AppFs = mockAfero
-	
+
 	err := ValidateAkeylessHomeDirectoryExists(config1)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
@@ -163,7 +164,14 @@ func TestValidateAkeylessCliProfileExists(t *testing.T) {
 	profilesDir1 := "/path/to/valid/profiles/directory"
 	profileName1 := "validProfile"
 	mockFs.MkdirAll(profilesDir1, 0755)
-	config1 := NewConfig("", "", profilesDir1, 0, false)
+	// create the profiles directory and a default profile
+	mockFs.MkdirAll(profilesDir1+"/profiles", 0755)
+	// create the profile file
+	mockFs.Create(profilesDir1 + "/profiles/" + profileName1 + ".toml")
+	// make sure the profile file is readable
+	mockFs.Chmod(profilesDir1+"/profiles/"+profileName1+".toml", 0444)
+
+	config1 := NewConfig("", profileName1, profilesDir1, 0, false)
 	config1.AppFs = mockAfero
 	err := ValidateAkeylessCliProfileExists(config1, profileName1)
 	if err != nil {
