@@ -117,23 +117,33 @@ func TestValidateConfig(t *testing.T) {
 }
 
 func TestValidateAkeylessHomeDirectoryExists(t *testing.T) {
+	var mockFs = afero.NewMemMapFs()
+	var mockAfero = &afero.Afero{Fs: mockFs}
+
 	// Test case 1: Valid Akeyless home directory
-	akeylessHomeDir1 := "/path/to/valid/akeyless/home/directory"
-	err := ValidateAkeylessHomeDirectoryExists(akeylessHomeDir1, "default")
+	mockFs.MkdirAll("/path/to/valid/akeyless/home/directory", 0755)
+	config1 := NewConfig("", "", "/path/to/valid/akeyless/home/directory", 0, false)
+	config1.AppFs = mockAfero
+	err := ValidateAkeylessHomeDirectoryExists(config1)
 	if err != nil {
 		t.Errorf("Expected no error, but got %v", err)
 	}
 
 	// Test case 2: Invalid Akeyless home directory (directory does not exist)
-	akeylessHomeDir2 := "/path/to/nonexistent/directory"
-	err = ValidateAkeylessHomeDirectoryExists(akeylessHomeDir2, "default")
+	config2 := NewConfig("", "", "/path/to/nonexistent/directory", 0, false)
+	config2.AppFs = mockAfero
+	err = ValidateAkeylessHomeDirectoryExists(config2)
 	if err == nil {
 		t.Errorf("Expected error, but got none")
 	}
 
 	// Test case 3: Invalid Akeyless home directory (not a directory)
-	akeylessHomeDir3 := "/path/to/file/not/directory"
-	err = ValidateAkeylessHomeDirectoryExists(akeylessHomeDir3, "default")
+	mockFs.MkdirAll("/path/to/file/not/directory", 0755)
+	mockFs.Remove("/path/to/file/not/directory")
+	mockFs.Create("/path/to/file/not/directory")
+	config3 := NewConfig("", "", "/path/to/file/not/directory", 0, false)
+	config3.AppFs = mockAfero
+	err = ValidateAkeylessHomeDirectoryExists(config3)
 	if err == nil {
 		t.Errorf("Expected error, but got none")
 	}
