@@ -186,7 +186,7 @@ func ValidateAkeylessCliProfileExists(config *Config, name string) error {
 		name = config.Profile
 	}
 	profileFilePath := filepath.Join(config.AkeylessPath, "profiles", name+".toml")
-	_, err := config.AppFs.Stat(profileFilePath)
+	fileInfo, err := config.AppFs.Stat(profileFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("the profile file " + profileFilePath + " does not exist")
@@ -195,6 +195,14 @@ func ValidateAkeylessCliProfileExists(config *Config, name string) error {
 			return errors.New("the profile file " + profileFilePath + " is not readable")
 		}
 		return err
+	}
+	// Check if the profile file is a directory
+	if fileInfo.IsDir() {
+		return errors.New("the profile file " + profileFilePath + " is a directory")
+	}
+	// Check if the profile file is readable
+	if (fileInfo.Mode() & 0400) == 0 {
+		return errors.New("the profile file " + profileFilePath + " is not readable")
 	}
 	return nil
 }

@@ -180,7 +180,7 @@ func TestValidateAkeylessCliProfileExists(t *testing.T) {
 
 	// Test case 2: Profile file does not exist
 	profileName2 := "nonexistentProfile"
-	config2 := NewConfig("", "", profilesDir1, 0, false)
+	config2 := NewConfig("", profileName2, profilesDir1, 0, false)
 	config2.AppFs = mockAfero
 	err = ValidateAkeylessCliProfileExists(config2, profileName2)
 	if err == nil {
@@ -189,7 +189,12 @@ func TestValidateAkeylessCliProfileExists(t *testing.T) {
 
 	// Test case 3: Profile file is not readable
 	profileName3 := "unreadableProfile"
-	config3 := NewConfig("", "", profilesDir1, 0, false)
+	// create the profile file
+	mockFs.Create(profilesDir1 + "/profiles/" + profileName3 + ".toml")
+	// make sure when the path of the profile file is fed into the fs.Stat function that an error is returned and the error fed into os.IsPermission(error) returns true
+	mockFs.Chmod(profilesDir1+"/profiles/"+profileName3+".toml", 0000)
+
+	config3 := NewConfig("", profileName3, profilesDir1, 0, false)
 	config3.AppFs = mockAfero
 	err = ValidateAkeylessCliProfileExists(config3, profileName3)
 	if err == nil {
