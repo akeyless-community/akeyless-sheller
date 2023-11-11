@@ -88,6 +88,8 @@ func TestValidateConfig(t *testing.T) {
 	// mock path to the profile inside the Akeyless home directory that is a file
 	mockFs.MkdirAll("/path/to/akeyless/profiles", 0444)
 	mockFs.Create("/path/to/akeyless/profiles/testProfile.toml")
+	// make sure the profile file is readable
+	mockFs.Chmod("/path/to/akeyless/profiles/testProfile.toml", 0444)
 	config1.AppFs = mockAfero
 
 	err := ValidateConfig(config1)
